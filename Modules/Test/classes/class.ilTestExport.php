@@ -329,6 +329,7 @@ class ilTestExport
 		{
 			$worksheet->write($row, $col++, ilExcelUtils::_convert_text($this->lng->txt("name")), $format_title);
 			$worksheet->write($row, $col++, ilExcelUtils::_convert_text($this->lng->txt("login")), $format_title);
+			$worksheet->write($row, $col++, ilExcelUtils::_convert_text($this->lng->txt("matriculation")), $format_title);
 		}
 		if (count($additionalFields))
 		{
@@ -391,6 +392,8 @@ class ilTestExport
 				{
 					$worksheet->write($row, $col++, ilExcelUtils::_convert_text($data->getParticipant($active_id)->getName()));
 					$worksheet->write($row, $col++, ilExcelUtils::_convert_text($data->getParticipant($active_id)->getLogin()));
+					$userfields = ilObjUser::_lookupFields($userdata->getUserID());
+					$worksheet->write($row, $col++, ilExcelUtils::_convert_text( $userfields['matriculation'] ) );
 				}
 				if (count($additionalFields))
 				{
@@ -787,6 +790,8 @@ class ilTestExport
 			$col++;
 			array_push($datarow, $this->lng->txt("login"));
 			$col++;
+			array_push($datarow, $this->lng->txt("matriculation"));
+			$col++;
 		}
 		$additionalFields = $this->test_obj->getEvaluationAdditionalFields();
 		if (count($additionalFields))
@@ -864,6 +869,8 @@ class ilTestExport
 				{
 					array_push($datarow2, $data->getParticipant($active_id)->getName());
 					array_push($datarow2, $data->getParticipant($active_id)->getLogin());
+					$userfields = ilObjUser::_lookupFields($userdata->getUserID());
+					array_push($datarow2, $userfields['matriculation']);
 				}
 				if (count($additionalFields))
 				{
