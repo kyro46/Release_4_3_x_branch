@@ -1264,6 +1264,7 @@ class ilObjTestGUI extends ilObjectGUI
 		$mc_scoring = new ilRadioGroupInputGUI($this->lng->txt("tst_score_mcmr_questions"), "mc_scoring");
 		$mc_scoring->addOption(new ilRadioOption($this->lng->txt("tst_score_mcmr_zero_points_when_unanswered"), 0, ''));
 		$mc_scoring->addOption(new ilRadioOption($this->lng->txt("tst_score_mcmr_use_scoring_system"), 1, ''));
+		$mc_scoring->addOption(new ilRadioOption($this->lng->txt("tst_score_mcmr_zero_points_when_all_or_unanswered"), 2, ''));
 		$mc_scoring->setValue($this->object->getMCScoring());
 		$mc_scoring->setInfo($this->lng->txt("tst_score_mcmr_questions_description"));
 		if ($total)

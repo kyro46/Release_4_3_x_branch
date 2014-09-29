@@ -819,6 +819,7 @@ class ilObjAssessmentFolderGUI extends ilObjectGUI
 			array(
                             '0' => $lng->txt("tst_score_mcmr_zero_points_when_unanswered"),
                             '1' => $lng->txt("tst_score_mcmr_use_scoring_system"),
+							'2' => $lng->txt("tst_score_mcmr_zero_points_when_all_or_unanswered"),
                         )
 			);
 

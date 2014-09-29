@@ -615,6 +615,10 @@ class assMultipleChoice extends assQuestion
 		{
 			$points = 0;
 		}
+		if (($mc_scoring == 2) && ((count($found_values) == count($this->answers)) || (count($found_values) == 0)))
+		{
+			$points = 0;
+		}
 		return $points;
 	}
 	

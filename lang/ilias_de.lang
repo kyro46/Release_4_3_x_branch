@@ -1144,6 +1144,7 @@ assessment#:#tst_score_mcmr_questions#:#Multiple Choice-Fragen
 assessment#:#tst_score_mcmr_questions_description#:#Abhängig von der Punktevergabe bei Multiple Choice Fragen kann es passieren, dass für Fragen, bei denen keine Antwort ausgewählt wurde, Punkte vergeben werden. Dies wird durch die Standardeinstellung verhindert, indem in diesem Fall die Frage als nicht beantwortet gewertet wird und die Punkte automatisch auf Null gesetzt werden.
 assessment#:#tst_score_mcmr_use_scoring_system#:#Vergabe der Punktezahl, auch wenn keine Antwort ausgewählt wurde
 assessment#:#tst_score_mcmr_zero_points_when_unanswered#:#Vergabe von 0 Punkten, wenn keine Antwort ausgewählt wurde
+assessment#:#tst_score_mcmr_zero_points_when_all_or_unanswered#:#Vergabe von 0 Punkten, wenn keine Antwort oder alle Antworten ausgewählt wurden
 assessment#:#tst_score_reporting#:#Ergebnisausgabe
 assessment#:#tst_score_reporting_date#:#Datum der Ergebnisausgabe
 assessment#:#tst_score_type#:#Art der Ergebnisausgabe
