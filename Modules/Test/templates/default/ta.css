@@ -1,7 +1,7 @@
 /**
  * ILIAS Open Source Test & Assessment styles
  *
- * @revision        $Id: ta.css 49206 2014-04-04 08:48:08Z mjansen $
+ * @revision        $Id: ta.css 54314 2014-10-16 11:02:55Z gvollbach $
  */
 
 .kiosk {
@@ -434,4 +434,8 @@ div.ilAssQuestionRelatedNavigationContainer
 
 .ilCenterForced {
 	text-align: center !important;
+}
+
+.test_specific_feedback td{
+    padding-right: 0.5em;
 }

@@ -27,7 +27,7 @@
 * Base class for creating and handling mail boxes
 *
 * @author Stefan Meyer <meyer@leifos.com>
-* @version $Id: class.ilAddressbook.php 23143 2010-03-09 12:15:33Z smeyer $
+* @version $Id: class.ilAddressbook.php 56287 2014-12-11 14:09:18Z jluetzen $
 *
 */
 
@@ -88,8 +88,11 @@ class ilAddressbook
 		global $ilDB;
 
 		if($a_query_str)
-		{
-		
+		{		
+			// #14768
+			$a_query_str = str_replace('%', '\%', $a_query_str);
+			$a_query_str = str_replace('_', '\_', $a_query_str);
+			
 			$query = "SELECT * FROM ".$this->table_addr." 
 				WHERE ( " .$ilDB->like('login', 'text', '%'.$a_query_str.'%'). " 
 				OR " .$ilDB->like('firstname', 'text', '%'.$a_query_str.'%'). "
@@ -104,8 +107,9 @@ class ilAddressbook
 		{
 			$res = $ilDB->queryf("
 				SELECT * FROM ".$this->table_addr." WHERE user_id = %s",
-				array('text', 'integer'),
-				array($this->table_addr, $this->user_id));
+				array('integer'),
+				array($this->user_id)
+			);
 		}
 	
 		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))

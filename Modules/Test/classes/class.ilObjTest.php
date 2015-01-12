@@ -10,7 +10,7 @@ include_once "./Modules/Test/classes/inc.AssessmentConstants.php";
 *
 * @author		Helmut Schottmüller <helmut.schottmueller@mac.com>
 * @author		Björn Heyser <bheyser@databay.de>
-* @version		$Id: class.ilObjTest.php 52172 2014-08-11 10:29:00Z bheyser $
+* @version		$Id: class.ilObjTest.php 56567 2014-12-18 09:05:51Z mjansen $
 *
 * @defgroup ModulesTest Modules/Test
 * @extends ilObject
@@ -495,7 +495,7 @@ class ilObjTest extends ilObject
 		$this->_customStyle = "";
 		$this->allowedUsersTimeGap = "";
 		$this->anonymity = 0;
-		$this->show_cancel = 1;
+		$this->show_cancel = 0;
 		$this->show_marker = 0;
 		$this->fixed_participants = 0;
 		$this->setShowPassDetails(TRUE);
@@ -3688,7 +3688,10 @@ function getAnswerFeedbackPoints()
 		global $ilDB;
 
 		$IN_userIds = $ilDB->in('user_fi', $userIds, false, 'integer');
-		$res = $ilDB->query("SELECT active_id FROM tst_active WHERE $IN_userIds");
+		$res = $ilDB->queryF(
+			"SELECT active_id FROM tst_active WHERE test_fi = %s AND $IN_userIds",
+			array('integer'), array($this->getTestId())
+		);
 
 		$activeIds = array();
 		while( $row = $ilDB->fetchAssoc($res) )
@@ -3710,17 +3713,13 @@ function getAnswerFeedbackPoints()
 			$ilDB->manipulate("DELETE FROM tst_test_rnd_qst WHERE $IN_activeIds");
 		}
 
-		include_once ("./Modules/Test/classes/class.ilObjAssessmentFolder.php");
-		if (ilObjAssessmentFolder::_enabledAssessmentLogging())
-		{
-			$this->logAction(sprintf($this->lng->txtlng("assessment", "log_selected_user_data_removed", ilObjAssessmentFolder::_getLogLanguage()), $this->userLookupFullName($this->_getUserIdFromActiveId($active_id))));
-		}
-
 		$IN_userIds = $ilDB->in('usr_id', $userIds, false, 'integer');
 		$ilDB->manipulateF(
 			"DELETE FROM usr_pref WHERE $IN_userIds AND keyword = %s",
 			array('text'), array("tst_password_".$this->getTestId())
 		);
+
+		include_once ("./Modules/Test/classes/class.ilObjAssessmentFolder.php");
 
 		foreach ($activeIds as $active_id)
 		{
@@ -3729,6 +3728,11 @@ function getAnswerFeedbackPoints()
 			if (@is_dir(CLIENT_WEB_DIR . "/assessment/tst_" . $this->getTestId() . "/$active_id"))
 			{
 				ilUtil::delDir(CLIENT_WEB_DIR . "/assessment/tst_" . $this->getTestId() . "/$active_id");
+			}
+
+			if (ilObjAssessmentFolder::_enabledAssessmentLogging())
+			{
+				$this->logAction(sprintf($this->lng->txtlng("assessment", "log_selected_user_data_removed", ilObjAssessmentFolder::_getLogLanguage()), $this->userLookupFullName($this->_getUserIdFromActiveId($active_id))));
 			}
 		}
 
@@ -4062,35 +4066,47 @@ function getAnswerFeedbackPoints()
 		return $row;
 	}
 
-/**
-* Get the id's of the questions which are already part of the test
-*
-* @return array An array containing the already existing questions
-* @access	public
-*/
-	function &getExistingQuestions($pass = NULL)
+	/**
+	 * Get the originals question ids of the questions which are already part of the test
+	 * @return array An array containing the already existing questions
+	 */
+	public function &getExistingQuestions($pass = NULL)
 	{
-		global $ilUser;
-		global $ilDB;
+		/**
+		 * @var $ilUser ilObjUser
+		 * @var $ilDB   ilDB
+		 */
+		global $ilUser, $ilDB;
 
 		$existing_questions = array();
-		$active_id = $this->getActiveIdOfUser($ilUser->getId());
-		if ($this->isRandomTest())
+		$active_id          = $this->getActiveIdOfUser($ilUser->getId());
+		if($this->isRandomTest())
 		{
-			if (is_null($pass)) $pass = 0;
-			$result = $ilDB->queryF("SELECT qpl_questions.original_id FROM qpl_questions, tst_test_rnd_qst WHERE tst_test_rnd_qst.active_fi = %s AND tst_test_rnd_qst.question_fi = qpl_questions.question_id AND tst_test_rnd_qst.pass = %s",
-				array('integer','integer'),
+			if(is_null($pass)) $pass = 0;
+			$result = $ilDB->queryF(
+				"SELECT qpl_questions.original_id
+				FROM qpl_questions, tst_test_rnd_qst
+				WHERE tst_test_rnd_qst.active_fi = %s
+				AND tst_test_rnd_qst.question_fi = qpl_questions.question_id
+				AND tst_test_rnd_qst.pass = %s
+				AND qpl_questions.original_id IS NOT NULL",
+				array('integer', 'integer'),
 				array($active_id, $pass)
 			);
 		}
 		else
 		{
-			$result = $ilDB->queryF("SELECT qpl_questions.original_id FROM qpl_questions, tst_test_question WHERE tst_test_question.test_fi = %s AND tst_test_question.question_fi = qpl_questions.question_id",
+			$result = $ilDB->queryF(
+				"SELECT qpl_questions.original_id
+				FROM qpl_questions, tst_test_question
+				WHERE tst_test_question.test_fi = %s
+				AND tst_test_question.question_fi = qpl_questions.question_id
+				AND qpl_questions.original_id IS NOT NULL",
 				array('integer'),
 				array($this->getTestId())
 			);
 		}
-		while ($data = $ilDB->fetchObject($result)) 
+		while($data = $ilDB->fetchObject($result))
 		{
 			array_push($existing_questions, $data->original_id);
 		}
@@ -4386,8 +4402,7 @@ function getAnswerFeedbackPoints()
 						tst_test_result.points reached,
 						tst_test_result.hint_count requested_hints,
 						tst_test_result.hint_points hint_points,
-						tst_test_result.answered answered,
-						tst_solutions.solution_id workedthru
+						tst_test_result.answered answered
 			
 			FROM		tst_test_result
 			
@@ -4408,6 +4423,8 @@ function getAnswerFeedbackPoints()
 			$arrResults[ $row['question_fi'] ] = $row;
 		}
 			
+		$numWorkedThrough = count($arrResults);
+
 		require_once "./Modules/TestQuestionPool/classes/class.assQuestion.php";
 		
 		$IN_question_ids = $ilDB->in('qpl_questions.question_id', $sequence, false, 'integer');
@@ -4455,7 +4472,7 @@ function getAnswerFeedbackPoints()
 				"type" => $row["type_tag"],
 				"qid" => $row['question_id'],
 				"original_id" => $row["original_id"],
-				"workedthrough" => ($arrResults[$row['question_id']]['workedthru']) ? 1 : 0,
+				"workedthrough" => isset($arrResults[$row['question_id']]) ? 1 : 0,
 				'answered' => $arrResults[$row['question_id']]['answered']
 			);
 			
@@ -4513,6 +4530,7 @@ function getAnswerFeedbackPoints()
 		$found['pass']['total_hint_points'] = $pass_hint_points;
 		$found['pass']['percent'] = ($pass_max > 0) ? $pass_reached / $pass_max : 0;
 		$found['pass']['obligationsAnswered'] = $obligationsAnswered;
+		$found['pass']['num_workedthrough'] = $numWorkedThrough;
 		
 		$found["test"]["total_max_points"] = $results['max_points'];
 		$found["test"]["total_reached_points"] = $results['reached_points'];
@@ -5144,15 +5162,23 @@ function getAnswerFeedbackPoints()
 		
 		while( $row = $ilDB->fetchAssoc($result) )
 		{
-			$data	->getParticipant($row["active_fi"])
-					->getPass($row["pass"])
-					->addAnsweredQuestion(
-						$row["question_fi"],
-						$row["maxpoints"],
-						$row["points"],
-						$row['answered']
-					)
-			;
+			$participantObject = $data->getParticipant($row["active_fi"]);
+
+			if( !($participantObject instanceof ilTestEvaluationUserData) )
+			{
+				continue;
+			}
+
+			$passObject = $participantObject->getPass($row["pass"]);
+
+			if( !($passObject instanceof ilTestEvaluationPassData) )
+			{
+				continue;
+			}
+
+			$passObject->addAnsweredQuestion(
+				$row["question_fi"], $row["maxpoints"], $row["points"], $row['answered']
+			);
 		}
 
 		foreach( array_keys($data->getParticipants()) as $active_id )
@@ -6008,12 +6034,10 @@ function getAnswerFeedbackPoints()
 	}
 
 	/**
-	* Receives parameters from a QTI parser and creates a valid ILIAS test object
-	*
-	* @param object $assessment The QTI assessment object
-	* @access public
-	*/
-	function fromXML(&$assessment)
+	 * Receives parameters from a QTI parser and creates a valid ILIAS test object
+	 * @param ilQTIAssessment $assessment
+	 */
+	public function fromXML(ilQTIAssessment $assessment)
 	{
 		unset($_SESSION["import_mob_xhtml"]);
 
@@ -6027,11 +6051,16 @@ function getAnswerFeedbackPoints()
 				$this->setIntroduction($this->QTIMaterialToString($material));
 			}
 		}
-		if ($assessment->getPresentationMaterial())
+
+		if(
+			$assessment->getPresentationMaterial() &&
+			$assessment->getPresentationMaterial()->getFlowMat(0) &&
+			$assessment->getPresentationMaterial()->getFlowMat(0)->getMaterial(0)
+		)
 		{
-			$this->setFinalStatement($this->QTIMaterialToString($assessment->getPresentationMaterial()->getMaterial(0)));
+			$this->setFinalStatement($this->QTIMaterialToString($assessment->getPresentationMaterial()->getFlowMat(0)->getMaterial(0)));
 		}
-		
+
 		foreach ($assessment->assessmentcontrol as $assessmentcontrol)
 		{
 			switch ($assessmentcontrol->getSolutionswitch())
@@ -8376,15 +8405,6 @@ function getAnswerFeedbackPoints()
 			$result["errormessage"] = $this->lng->txt("maximum_nr_of_tries_reached");
 			return $result;
 		}
-		
-		if ($this->getTestSession($active_id)->isSubmitted())
-		{
-			$result["executable"] = FALSE;
-			$result["errormessage"] = $this->lng->txt("maximum_nr_of_tries_reached");
-			return $result;
-		}
-
-		// TODO: max. processing time
 
 		return $result;
 	}
@@ -9899,7 +9919,16 @@ function getAnswerFeedbackPoints()
 			$html = str_replace("&otimes;", "X", $html);
 		}
 		$html = preg_replace("/src=\".\\//ims", "src=\"" . ILIAS_HTTP_PATH . "/", $html);
-		$this->deliverPDFfromFO($this->processPrintoutput2FO($html), $title);
+		// #12866
+		$html = preg_replace('/&(?!([\w]+?;|#[\d]+?;))/', '&amp;', $html);
+		$fo = $this->processPrintoutput2FO($html);
+		if( $fo === false )
+		{
+			global $ilLog, $ilias;
+			$ilLog->write(__METHOD__.': could not process HTML to FO: '.$html);
+			$ilias->raiseError(__METHOD__.': could not process HTML to FO: '.htmlentities($html));
+		}
+		$this->deliverPDFfromFO($fo, $title);
 	}
 	
 	/**
@@ -10107,7 +10136,7 @@ function getAnswerFeedbackPoints()
 	/**
 	* Returns the test session data for the active user
 	*
-	* @return object The ilTestSession object or FALSE if the creation of the object fails
+	* @return ilTestSession object The ilTestSession object or FALSE if the creation of the object fails
 	* @access public
 	*/
 	function &getTestSession($active_id = "")

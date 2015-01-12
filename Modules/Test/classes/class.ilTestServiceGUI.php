@@ -34,7 +34,7 @@ include_once 'Modules/Test/classes/class.ilTestService.php';
 *
 * @author	Helmut Schottmüller <helmut.schottmueller@mac.com>
 * @author	Björn Heyser <bheyser@databay.de>
-* @version	$Id: class.ilTestServiceGUI.php 49818 2014-05-05 09:29:20Z bheyser $
+* @version	$Id: class.ilTestServiceGUI.php 56044 2014-12-05 13:55:57Z bheyser $
 *
 * @ingroup ModulesTest
 */
@@ -178,8 +178,7 @@ class ilTestServiceGUI
 							'tst_pass_details', 
 							$this->ctrl->getLinkTargetByClass($targetclass, $targetcommand)
 						);
-						
-						if( $this->object->isPassDeletionAllowed() )
+						if($this->object->isPassDeletionAllowed() && $pass != $counted_pass)
 						{
 							$aslgui->addItem(
 								$this->lng->txt("delete"), 
@@ -223,7 +222,8 @@ class ilTestServiceGUI
 				
 				if (!$short)
 				{
-					$template->setVariable("VALUE_ANSWERED", $this->object->getAnsweredQuestionCount($active_id, $pass) . " " . strtolower($this->lng->txt("of")) . " " . (count($result_array)-2));
+					$answered = $result_array['pass']['num_workedthrough'] . ' ' . strtolower($this->lng->txt('of')) . ' ' . (count($result_array) - 2);
+					$template->setVariable("VALUE_ANSWERED", $answered);
 					if( $this->object->isOfferingQuestionHintsEnabled() )
 					{
 						$template->setVariable("VALUE_HINTS", $total_requested_hints);

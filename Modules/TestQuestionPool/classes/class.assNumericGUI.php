@@ -33,7 +33,7 @@ include_once "./Modules/Test/classes/inc.AssessmentConstants.php";
 * @author		Helmut SchottmÃ¼ller <helmut.schottmueller@mac.com>
 * @author		Nina Gharib <nina@wgserve.de>
 * @author		Björn Heyser <bheyser@databay.de>
-* @version	$Id: class.assNumericGUI.php 46074 2013-11-07 09:18:51Z mbecker $
+* @version	$Id: class.assNumericGUI.php 54630 2014-10-28 15:30:35Z bheyser $
 * @ingroup ModulesTestQuestionPool
 */
 class assNumericGUI extends assQuestionGUI
@@ -158,6 +158,14 @@ class assNumericGUI extends assQuestionGUI
 		$upper_limit->setRequired(true);
 		$upper_limit->setValue($this->object->getUpperLimit());
 		$form->addItem($upper_limit);
+
+		if( $this->object->getMaxChars() > 0 )
+		{
+			$lower_limit->setSize($this->object->getMaxChars());
+			$lower_limit->setMaxLength($this->object->getMaxChars());
+			$upper_limit->setSize($this->object->getMaxChars());
+			$upper_limit->setMaxLength($this->object->getMaxChars());
+		}
 
 		$this->addQuestionFormCommandButtons($form);
 

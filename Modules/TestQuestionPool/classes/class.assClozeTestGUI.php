@@ -31,7 +31,7 @@ include_once "./Modules/TestQuestionPool/classes/class.assQuestionGUI.php";
 *
 * @author		Helmut Schottmüller <helmut.schottmueller@mac.com>
 * @author		Björn Heyser <bheyser@databay.de>
-* @version	$Id: class.assClozeTestGUI.php 48972 2014-03-25 16:03:39Z mjansen $
+* @version	$Id: class.assClozeTestGUI.php 54630 2014-10-28 15:30:35Z bheyser $
 * @ingroup ModulesTestQuestionPool
 */
 class assClozeTestGUI extends assQuestionGUI
@@ -243,6 +243,12 @@ class assClozeTestGUI extends assQuestionGUI
 				if (count($gap->getItemsRaw()) == 0) $gap->addItem(new assAnswerCloze("", 0, 0));
 				$values->setValues($gap->getItemsRaw());
 				$form->addItem($values);
+
+				if( $this->object->getFixedTextLength() > 0 )
+				{
+					$values->setSize($this->object->getFixedTextLength());
+					$values->setMaxLength($this->object->getFixedTextLength());
+				}
 			}
 			else if ($gap->getType() == CLOZE_SELECT)
 			{
@@ -308,6 +314,16 @@ class assClozeTestGUI extends assQuestionGUI
 					$upperbound->setValue(ilUtil::prepareFormOutput($item->getUpperBound()));					
 					$form->addItem($upperbound);
 
+					if( $this->object->getFixedTextLength() > 0 )
+					{
+						$value->setSize($this->object->getFixedTextLength());
+						$value->setMaxLength($this->object->getFixedTextLength());
+						$lowerbound->setSize($this->object->getFixedTextLength());
+						$lowerbound->setMaxLength($this->object->getFixedTextLength());
+						$upperbound->setSize($this->object->getFixedTextLength());
+						$upperbound->setMaxLength($this->object->getFixedTextLength());
+					}
+
 					$points = new ilNumberInputGUI($this->lng->txt('points'), "gap_" . $i . "_numeric_points");
 					$points->allowDecimals(true);
 					$points->setSize(3);
@@ -317,7 +333,7 @@ class assClozeTestGUI extends assQuestionGUI
 				}
 			}
 		}
-		
+
 		$form->addCommandButton('createGaps', $this->lng->txt('create_gaps'));
 		$this->addQuestionFormCommandButtons($form);
 	

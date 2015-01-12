@@ -14,7 +14,7 @@ include_once 'Modules/Test/classes/class.ilTestExpressPage.php';
  *
  * @author		Helmut Schottmüller <helmut.schottmueller@mac.com>
  * @author		Björn Heyser <bheyser@databay.de>
- * @version		$Id: class.ilObjTestGUI.php 53904 2014-09-26 12:57:19Z mjansen $
+ * @version		$Id: class.ilObjTestGUI.php 54126 2014-10-09 09:04:37Z mjansen $
  *
  * @ilCtrl_Calls ilObjTestGUI: ilObjCourseGUI, ilMDEditorGUI, ilTestOutputGUI
  * @ilCtrl_Calls ilObjTestGUI: ilTestEvaluationGUI, ilPermissionGUI
@@ -235,6 +235,12 @@ class ilObjTestGUI extends ilObjectGUI
 
                         case 'ilpageeditorgui':
                         case 'iltestexpresspageobjectgui':
+global $ilDB, $ilUser;
+					require_once 'Modules/TestQuestionPool/classes/class.ilAssIncompleteQuestionPurger.php';
+					$incompleteQuestionPurger = new ilAssIncompleteQuestionPurger($ilDB);
+					$incompleteQuestionPurger->setOwnerId($ilUser->getId());
+					$incompleteQuestionPurger->purge();
+
                             $qid = $_REQUEST['q_id'];
 
 							// :FIXME: does not work

@@ -7,7 +7,7 @@ include_once "./Modules/Test/classes/inc.AssessmentConstants.php";
 * Class ilObjQuestionPool
 *
 * @author		Helmut Schottmüller <helmut.schottmueller@mac.com>
-* @version $Id: class.ilObjQuestionPool.php 37397 2012-10-06 08:32:18Z bheyser $
+* @version $Id: class.ilObjQuestionPool.php 54075 2014-10-07 11:33:44Z bheyser $
 *
 * @extends ilObject
 * @defgroup ModulesTestQuestionPool Modules/TestQuestionPool
@@ -1596,15 +1596,11 @@ class ilObjQuestionPool extends ilObject
 	public function purgeQuestions()
 	{
 		global $ilDB, $ilUser;
-		
-		$result = $ilDB->queryF("SELECT question_id FROM qpl_questions WHERE owner = %s AND tstamp = %s", 
-			array("integer", "integer"),
-			array($ilUser->getId(), 0)
-		);
-		while ($data = $ilDB->fetchAssoc($result))
-		{
-			$this->deleteQuestion($data["question_id"]);
-		}
+
+		require_once 'Modules/TestQuestionPool/classes/class.ilAssIncompleteQuestionPurger.php';
+		$incompleteQuestionPurger = new ilAssIncompleteQuestionPurger($ilDB);
+		$incompleteQuestionPurger->setOwnerId($ilUser->getId());
+		$incompleteQuestionPurger->purge();
 	}
 } // END class.ilObjQuestionPool
 ?>

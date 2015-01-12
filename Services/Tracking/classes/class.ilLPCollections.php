@@ -7,7 +7,7 @@
 *
 * @author Stefan Meyer <meyer@leifos.com>
 *
-* @version $Id: class.ilLPCollections.php 49910 2014-05-07 11:29:26Z jluetzen $
+* @version $Id: class.ilLPCollections.php 56008 2014-12-05 10:17:25Z jluetzen $
 *
 * @ingroup ServicesTracking
 *
@@ -128,7 +128,8 @@ class ilLPCollections
 
 		$query = "UPDATE ut_lp_collections ".
 			"SET active = ".$ilDB->quote(0,'integer')." ".
-			"WHERE ".$ilDB->in('grouping_id', $grouping_ids, false, 'integer');
+			"WHERE ".$ilDB->in('grouping_id', $grouping_ids, false, 'integer')." ".
+			"AND obj_id = ".$ilDB->quote($a_obj_id,'integer');
 		$ilDB->manipulate($query);
 		return;
 	}
@@ -197,7 +198,8 @@ class ilLPCollections
 
 		$query = "UPDATE ut_lp_collections ".
 			"SET active = ".$ilDB->quote(1,'integer')." ".
-			"WHERE ".$ilDB->in('grouping_id', $grouping_ids, false, 'integer');
+			"WHERE ".$ilDB->in('grouping_id', $grouping_ids, false, 'integer')." ".
+			"AND obj_id = ".$ilDB->quote($a_obj_id,'integer');
 		$ilDB->manipulate($query);
 		return;
 	}

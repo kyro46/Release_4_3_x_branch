@@ -26,7 +26,7 @@
 * Class ilObjSurveyGUI
 *
 * @author		Helmut Schottmüller <helmut.schottmueller@mac.com>
-* @version  $Id: class.ilObjSurveyGUI.php 51811 2014-07-28 14:49:30Z jluetzen $
+* @version  $Id: class.ilObjSurveyGUI.php 54746 2014-10-31 13:46:51Z jluetzen $
 *
 * @ilCtrl_Calls ilObjSurveyGUI: ilSurveyEvaluationGUI, ilSurveyExecutionGUI
 * @ilCtrl_Calls ilObjSurveyGUI: ilMDEditorGUI, ilPermissionGUI
@@ -1687,7 +1687,16 @@ class ilObjSurveyGUI extends ilObjectGUI
 		else
 		{
 			ilUtil::sendInfo($this->lng->txt("enter_questionblock_title"));
-			$this->defineQuestionblockObject();
+			
+			// #14433
+			if(!$_POST["questionblock_id"])
+			{
+				$this->defineQuestionblockObject();
+			}
+			else
+			{
+				$this->defineQuestionblock($_POST["questionblock_id"]);
+			}
 			return;
 		}
 	}

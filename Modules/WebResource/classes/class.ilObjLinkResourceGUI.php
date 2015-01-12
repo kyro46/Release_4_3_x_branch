@@ -10,7 +10,7 @@ require_once 'Services/LinkChecker/interfaces/interface.ilLinkCheckerGUIRowHandl
 * Class ilObjLinkResourceGUI
 *
 * @author Stefan Meyer <smeyer.ilias@gmx.de> 
-* @version $Id: class.ilObjLinkResourceGUI.php 50502 2014-06-03 12:03:12Z jluetzen $
+* @version $Id: class.ilObjLinkResourceGUI.php 55821 2014-12-02 10:28:01Z fwolf $
 * 
 * @ilCtrl_Calls ilObjLinkResourceGUI: ilMDEditorGUI, ilPermissionGUI, ilInfoScreenGUI, ilObjectCopyGUI
 * @ilCtrl_Calls ilObjLinkResourceGUI: ilExportGUI, ilWorkspaceAccessGUI, ilCommonActionDispatcherGUI
@@ -1013,11 +1013,18 @@ class ilObjLinkResourceGUI extends ilObject2GUI implements ilLinkCheckerGUIRowHa
 		$this->checkPermission('write');
 		$this->activateTabs('content','id_content_view');
 		
-		$link_ids = is_array($_POST['link_ids']) ?
-			$_POST['link_ids'] :
-			array($_GET['link_id']);
-		
-		if(!$link_ids)
+		$link_ids = array();
+
+		if(is_array($_POST['link_ids']))
+		{
+			$link_ids =$_POST['link_ids'];
+		}
+		elseif(isset($_GET['link_id']))
+		{
+			$link_ids = array($_GET['link_id']);
+		}
+
+		if(!count($link_ids) > 0)
 		{
 			ilUtil::sendFailure($this->lng->txt('select_one'));
 			$this->view();

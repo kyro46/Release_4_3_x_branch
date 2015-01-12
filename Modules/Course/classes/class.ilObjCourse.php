@@ -29,7 +29,7 @@ include_once './Services/Membership/interfaces/interface.ilMembershipRegistratio
 * Class ilObjCourse
 *
 * @author Stefan Meyer <meyer@leifos.com> 
-* @version $Id: class.ilObjCourse.php 51121 2014-07-02 13:01:14Z smeyer $
+* @version $Id: class.ilObjCourse.php 55270 2014-11-18 12:23:59Z jluetzen $
 * 
 */
 class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
@@ -836,6 +836,13 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
 	 	
 	 	// Assign admin
 		$new_obj->getMemberObject()->add($ilUser->getId(),IL_CRS_ADMIN);
+		
+		// #14596		
+		$cwo = ilCopyWizardOptions::_getInstance($a_copy_id);		
+		if($cwo->isRootNode($this->getRefId()))
+		{
+			$this->setOfflineStatus(true);
+		}			
 		
 		// Copy settings
 		$this->cloneSettings($new_obj);

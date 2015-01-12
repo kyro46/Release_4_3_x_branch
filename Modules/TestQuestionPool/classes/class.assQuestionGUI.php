@@ -33,7 +33,7 @@ include_once 'Modules/Test/classes/class.ilTestExpressPage.php';
 *
 * @author		Helmut Schottmüller <helmut.schottmueller@mac.com>
 * @author		Björn Heyser <bheyser@databay.de>
-* @version		$Id: class.assQuestionGUI.php 42157 2013-05-11 07:04:52Z mjansen $
+* @version		$Id: class.assQuestionGUI.php 54637 2014-10-28 16:30:01Z bheyser $
 * @ingroup		ModulesTestQuestionPool
 */
 abstract class assQuestionGUI
@@ -333,7 +333,7 @@ abstract class assQuestionGUI
 		
 		if( $this->object->areObligationsToBeConsidered() && ilObjTest::isQuestionObligatory($this->object->getId()) )
 		{
-			$obligatoryString = ' *';
+			$obligatoryString = '([-_-])';
 		}
 		else
 		{
@@ -364,6 +364,12 @@ abstract class assQuestionGUI
 		}
 		$presentation = $page_gui->presentation();
 		if (strlen($maxpoints)) $presentation = str_replace($maxpoints, "<em>$maxpoints</em>", $presentation);
+		if (strlen($obligatoryString))
+		{
+			$replacement	='<br><span class="obligatory" style="font-size:small">'.
+				$this->lng->txt("tst_you_have_to_answer_this_question").'</span>';
+			$presentation 	= str_replace($obligatoryString, $replacement, $presentation);
+		}
 		// bugfix for non XHTML conform img tags in ILIAS Learning Module Editor
 		$presentation = preg_replace("/src=\".\\//ims", "src=\"" . ILIAS_HTTP_PATH . "/", $presentation);
 		return $presentation;
@@ -1298,12 +1304,15 @@ abstract class assQuestionGUI
 				$file->setRequired(TRUE);
 				$file->enableFileNameSelection("filename");
 				//$file->setSuffixes(array("doc","xls","png","jpg","gif","pdf"));
-				if ($_FILES["file"]["tmp_name"])
+				if( $_FILES["file"]["tmp_name"] && $file->checkInput() )
 				{
 					if (!file_exists($this->object->getSuggestedSolutionPath())) ilUtil::makeDirParents($this->object->getSuggestedSolutionPath());
+					
 					$res = ilUtil::moveUploadedFile($_FILES["file"]["tmp_name"], $_FILES["file"]["name"], $this->object->getSuggestedSolutionPath() . $_FILES["file"]["name"]);
 					if ($res)
 					{
+						ilUtil::renameExecutables($this->object->getSuggestedSolutionPath());
+						
 						// remove an old file download
 						if (is_array($solution_array["value"])) @unlink($this->object->getSuggestedSolutionPath() . $solution_array["value"]["name"]);
 						$file->setValue($_FILES["file"]["name"]);
@@ -1321,6 +1330,7 @@ abstract class assQuestionGUI
 					}
 					else
 					{
+						// BH: $res as info string? wtf? it holds a bool or something else!!?
 						ilUtil::sendInfo($res);
 					}
 				}

@@ -14,7 +14,7 @@ include_once "./Modules/Test/classes/inc.AssessmentConstants.php";
  * 
  * @author		Helmut Schottmüller <helmut.schottmueller@mac.com>
  * @author		Björn Heyser <bheyser@databay.de>
- * @version		$Id: class.assQuestion.php 50581 2014-06-06 08:06:53Z bheyser $
+ * @version		$Id: class.assQuestion.php 54530 2014-10-23 15:26:07Z mjansen $
  * 
  * @ingroup		ModulesTestQuestionPool
  */
@@ -661,7 +661,12 @@ abstract class assQuestion
 					array_push($output, '<a href="' . assQuestion::_getInternalLinkHref($solution["internal_link"]) . '">' . $this->lng->txt("solution_hint") . '</a>');
 					break;
 				case "file":
-					array_push($output, '<a href="' . $this->getSuggestedSolutionPathWeb() . $solution["value"]["name"] . '">' . ((strlen($solution["value"]["filenme"])) ? ilUtil::prepareFormOutput($solution["value"]["filenme"]) : $this->lng->txt("solution_hint")) . '</a>');
+					$possible_texts = array_values(array_filter(array(
+						ilUtil::prepareFormOutput($solution['value']['filename']),
+						ilUtil::prepareFormOutput($solution['value']['name']),
+						$this->lng->txt('tst_show_solution_suggested')
+					)));
+					array_push($output, '<a href="' . $this->getSuggestedSolutionPathWeb() . $solution["value"]["name"] . '">' . $possible_texts[0] . '</a>');
 					break;
 				case "text":
 					array_push($output, $this->prepareTextareaOutput($solution["value"]));
@@ -2633,14 +2638,19 @@ abstract class assQuestion
 		}
 	}
 
-/**
-* Creates an instance of a question with a given question id
-*
-* @param integer $question_id The question id
-* @return object The question instance
-* @access public
-*/
-	function &_instanciateQuestion($question_id) 
+	/**
+	 * Creates an instance of a question with a given question id
+	 *
+	 * @param integer $question_id The question id
+	 * @return assQuestion The question instance
+	 * @deprecated use assQuestion::_instantiateQuestion() instead.
+	 */
+	public static function _instanciateQuestion($question_id)
+	{
+		return self::_instantiateQuestion($question_id);
+	}
+
+	public static function _instantiateQuestion($question_id)
 	{
 		if (strcmp($question_id, "") != 0)
 		{

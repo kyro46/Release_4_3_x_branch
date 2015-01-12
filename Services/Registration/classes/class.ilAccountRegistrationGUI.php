@@ -8,7 +8,7 @@
 * Class ilAccountRegistrationGUI
 *
 * @author Stefan Meyer <smeyer.ilias@gmx.de>
-* @version $Id: class.ilAccountRegistrationGUI.php 45492 2013-10-16 08:24:58Z nkrzywon $
+* @version $Id: class.ilAccountRegistrationGUI.php 54442 2014-10-21 12:34:16Z jluetzen $
 *
 * @ilCtrl_Calls ilAccountRegistrationGUI:
 *
@@ -215,6 +215,13 @@ class ilAccountRegistrationGUI
 			{
 				$role->setInfo($lng->txt("registration_code_role_info"));
 			}
+		}
+		
+		// #14272
+		if($this->registration_settings->getRegistrationType() == IL_REG_ACTIVATION)
+		{
+			$mail_obj = $this->form->getItemByPostVar('usr_email');
+			$mail_obj->setRequired(true);
 		}
 
 		

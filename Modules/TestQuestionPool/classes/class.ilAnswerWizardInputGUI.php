@@ -25,7 +25,7 @@
 * This class represents a single choice wizard property in a property form.
 *
 * @author Helmut Schottmüller <ilias@aurealis.de> 
-* @version $Id: class.ilAnswerWizardInputGUI.php 35423 2012-07-07 17:42:36Z akill $
+* @version $Id: class.ilAnswerWizardInputGUI.php 54755 2014-11-03 08:30:41Z gvollbach $
 * @ingroup	ServicesForm
 */
 class ilAnswerWizardInputGUI extends ilTextInputGUI
@@ -34,7 +34,9 @@ class ilAnswerWizardInputGUI extends ilTextInputGUI
 	protected $allowMove = false;
 	protected $singleline = true;
 	protected $qstObject = null;
-	
+	protected $minvalue = false;
+	protected $minvalueShouldBeGreater = false;
+
 	/**
 	* Constructor
 	*
@@ -151,6 +153,44 @@ class ilAnswerWizardInputGUI extends ilTextInputGUI
 	}
 
 	/**
+	 * Set minvalueShouldBeGreater
+	 *
+	 * @param	boolean	$a_bool	true if the minimum value should be greater than minvalue
+	 */
+	function setMinvalueShouldBeGreater($a_bool)
+	{
+		$this->minvalueShouldBeGreater = $a_bool;
+	}
+
+	/**
+	 * Get minvalueShouldBeGreater
+	 *
+	 * @return	boolean	true if the minimum value should be greater than minvalue
+	 */
+	function minvalueShouldBeGreater()
+	{
+		return $this->minvalueShouldBeGreater;
+	}
+	/**
+	 * Set Minimum Value.
+	 *
+	 * @param	float	$a_minvalue	Minimum Value
+	 */
+	function setMinValue($a_minvalue)
+	{
+		$this->minvalue = $a_minvalue;
+	}
+
+	/**
+	 * Get Minimum Value.
+	 *
+	 * @return	float	Minimum Value
+	 */
+	function getMinValue()
+	{
+		return $this->minvalue;
+	}
+	/**
 	* Check input, strip slashes etc. set alert, if input is not ok.
 	*
 	* @return	boolean		Input ok, true/false
@@ -185,6 +225,29 @@ class ilAnswerWizardInputGUI extends ilTextInputGUI
 					{
 						$this->setAlert($lng->txt("form_msg_numeric_value_required"));
 						return FALSE;
+					}
+					if ($this->minvalueShouldBeGreater())
+					{
+						if (trim($points) != "" &&
+							$this->getMinValue() !== false &&
+							$points <= $this->getMinValue())
+						{
+							$this->setAlert($lng->txt("form_msg_value_too_low"));
+
+							return false;
+						}
+					}
+					else
+					{
+						if (trim($points) != "" &&
+							$this->getMinValue() !== false &&
+							$points < $this->getMinValue())
+						{
+							$this->setAlert($lng->txt("form_msg_value_too_low"));
+
+							return false;
+
+						}
 					}
 				}
 			}

@@ -32,7 +32,7 @@ include_once "./Modules/Test/classes/inc.AssessmentConstants.php";
 *
 * @author		Helmut Schottmüller <helmut.schottmueller@mac.com>
 * @author		Björn Heyser <bheyser@databay.de>
-* @version	$Id: class.assTextSubsetGUI.php 48930 2014-03-25 10:34:52Z mjansen $
+* @version	$Id: class.assTextSubsetGUI.php 54755 2014-11-03 08:30:41Z gvollbach $
 * @ingroup ModulesTestQuestionPool
 */
 class assTextSubsetGUI extends assQuestionGUI
@@ -137,7 +137,8 @@ class assTextSubsetGUI extends assQuestionGUI
 
 		// maximum available points
 		$points = new ilNumberInputGUI($this->lng->txt("maximum_points"), "points");
-		$points->setMinValue(0.25);
+		$points->setMinValue(0.0);
+		$points->setMinvalueShouldBeGreater(true);
 		$points->setSize(6);
 		$points->setDisabled(true);
 		$points->setValue($this->object->getMaximumPoints());
@@ -169,6 +170,7 @@ class assTextSubsetGUI extends assQuestionGUI
 		$choices->setQuestionObject($this->object);
 		$choices->setSingleline(true);
 		$choices->setAllowMove(false);
+		$choices->setMinValue(0.0);
 		if ($this->object->getAnswerCount() == 0) $this->object->addAnswer("", 0, 0);
 		$choices->setValues($this->object->getAnswers());
 		$form->addItem($choices);

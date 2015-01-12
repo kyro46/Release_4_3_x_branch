@@ -12,7 +12,7 @@ include_once 'Modules/Course/classes/class.ilCourseParticipant.php';
 *
 *
 * @author Alex Killing <alex.killing@gmx.de>
-* @version $Id: class.ilObjCourseAccess.php 46343 2013-11-21 10:46:26Z akill $
+* @version $Id: class.ilObjCourseAccess.php 55429 2014-11-21 13:40:05Z fwolf $
 *
 */
 class ilObjCourseAccess extends ilObjectAccess
@@ -81,6 +81,15 @@ class ilObjCourseAccess extends ilObjectAccess
 					return true;
 				}
 				break;
+
+			case 'join':
+
+				include_once './Modules/Course/classes/class.ilCourseWaitingList.php';
+				if(ilCourseWaitingList::_isOnList($a_user_id, $a_obj_id))
+				{
+					return false;
+				}
+				break;
 		}
 		
 		switch ($a_permission)
@@ -120,12 +129,6 @@ class ilObjCourseAccess extends ilObjectAccess
 				
 			case 'join':				
 				if(!self::_registrationEnabled($a_obj_id))
-				{
-					return false;
-				}
-				
-				include_once './Modules/Course/classes/class.ilCourseWaitingList.php';
-				if(ilCourseWaitingList::_isOnList($a_user_id, $a_obj_id))
 				{
 					return false;
 				}

@@ -5,7 +5,7 @@
 * @module		language file English
 * @modulegroup	language
 * @author 		Matthias Kunkel <mkunkel@me.com>
-* @version		$Id: ilias_en.lang 53844 2014-09-25 15:40:09Z mjansen $
+* @version		$Id: ilias_en.lang 54630 2014-10-28 15:30:35Z bheyser $
 */
 // The language file starts beyond the HTML-comment below. DO NOT modify this line!
 // To edit your language file with a spreadsheet (i.e. Excel or StarCalc) remove all lines
@@ -287,7 +287,8 @@ assessment#:#circle_click_circle#:#Please click on a circle point of the desired
 assessment#:#circle#:#Circle
 assessment#:#clientip#:#Client IP
 assessment#:#close_text_hint#:#You can define a gap by entering [gap][/gap] at the text position of your choice. Press the 'Create gaps' button to add an editable form for every gap.
-assessment#:#cloze_fixed_textlength_description#:#If you enter a value greater than 0, all text and numeric gap text fields will be created with the fixed length of this value.
+assessment#:#cloze_fixed_textlength_description#:#If you enter a value, all text gap fields as well as all numeric gap fields will be created with a fixed length of this value, so entering more than the allowed characters is not possible. Note, that for numeric gaps the decimal separator is counted as a regular character.
+assessment#:#qpl_maxchars_info_numeric_question#:#If you enter a value, the field for the numerical answer will be created with a fixed length of this value, so entering more than the allowed characters is not possible. Note, that for numeric gaps the decimal separator is counted as a regular character.
 assessment#:#cloze_fixed_textlength#:#Text Field Length
 assessment#:#cloze_text#:#Cloze Text
 assessment#:#cloze_textgap_case_insensitive#:#Case Insensitive
@@ -659,6 +660,7 @@ assessment#:#question_saved_for_upload#:#The question was saved automatically in
 assessment#:#question_short#:#Q
 assessment#:#question_summary#:#List of Questions
 assessment#:#obligations_summary#:#List of Obligatory Questions
+assessment#:#tst_you_have_to_answer_this_question#:#You have to answer this question to be able to finish the test.
 assessment#:#question_title#:#Question Title
 assessment#:#question_type#:#Question Type
 assessment#:#questionpool_not_entered#:#Please enter a name for a question pool!

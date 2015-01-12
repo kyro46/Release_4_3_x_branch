@@ -19,7 +19,7 @@ define ("IL_NO_HEADER", "none");
 *
 * @author Alex Killing <alex.killing@gmx.de>
 *
-* @version $Id: class.ilPageObject.php 43889 2013-08-02 12:17:54Z akill $
+* @version $Id: class.ilPageObject.php 56660 2014-12-23 13:00:42Z akill $
 *
 * @ingroup ServicesCOPage
 */
@@ -1656,6 +1656,10 @@ if ($_GET["pgEdMediaMode"] != "") {echo "ilPageObject::error media"; exit;}
 	function validateDom()
 	{
 		$this->stripHierIDs();
+
+		// possible fix for #14820
+		libxml_disable_entity_loader(false);
+
 		$this->dom->validate($error);
 		return $error;
 	}

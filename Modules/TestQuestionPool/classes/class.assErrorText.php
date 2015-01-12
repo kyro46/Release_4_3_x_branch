@@ -12,7 +12,7 @@ include_once "./Modules/Test/classes/inc.AssessmentConstants.php";
  * 
  * @author		Helmut Schottmüller <helmut.schottmueller@mac.com> 
  * @author		Björn Heyser <bheyser@databay.de>
- * @version		$Id: class.assErrorText.php 47445 2014-01-22 17:03:37Z bheyser $
+ * @version		$Id: class.assErrorText.php 55212 2014-11-17 10:39:55Z jluetzen $
  * 
  * @ingroup		ModulesTestQuestionPool
  */
@@ -927,6 +927,16 @@ class assErrorText extends assQuestion
 				if(substr($item, 0, 1) == "#")
 				{
 					$item = substr($item, 1);
+					
+					// #14115 - add position to correct answer 
+					foreach($result["correct_answers"] as $aidx => $answer)
+					{
+						if($answer["answertext_wrong"] == $item && !$answer["pos"])
+						{
+							$result["correct_answers"][$aidx]["pos"] = $textidx."_".($idx+1);
+							break;
+						}
+					}
 				}
 				array_push($answers, array(
 					"answertext" => (string) ilUtil::prepareFormOutput($item),

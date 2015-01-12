@@ -33,7 +33,7 @@ include_once "./Modules/Test/classes/class.ilObjTest.php";
  * @author		Helmut Schottmüller <helmut.schottmueller@mac.com>
  * @author		Björn Heyser <bheyser@databay.de>
  * 
- * @version		$Id: class.ilObjQuestionPoolGUI.php 53922 2014-09-26 16:12:11Z mjansen $
+ * @version		$Id: class.ilObjQuestionPoolGUI.php 54367 2014-10-17 10:29:21Z bheyser $
  *
  * @ilCtrl_Calls ilObjQuestionPoolGUI: ilPageObjectGUI
  * @ilCtrl_Calls ilObjQuestionPoolGUI: assMultipleChoiceGUI, assClozeTestGUI, assMatchingQuestionGUI
@@ -94,8 +94,11 @@ class ilObjQuestionPoolGUI extends ilObjectGUI
 		if (!$this->getCreationMode() &&
 			$ilAccess->checkAccess("read", "", $_GET["ref_id"]))
 		{
-			$ilNavigationHistory->addItem($_GET["ref_id"],
-				"ilias.php?baseClass=ilObjQuestionPoolGUI&cmd=questions&ref_id=".$_GET["ref_id"], "qpl");
+			if('qpl' == $this->object->getType())
+			{
+				$ilNavigationHistory->addItem($_GET["ref_id"],
+					"ilias.php?baseClass=ilObjQuestionPoolGUI&cmd=questions&ref_id=" . $_GET["ref_id"], "qpl");
+			}
 		}
 		
 		$cmd = $this->ctrl->getCmd("questions");
@@ -892,8 +895,10 @@ class ilObjQuestionPoolGUI extends ilObjectGUI
 
 			}
 		}
-
-		$this->object->purgeQuestions();
+		if($this->object instanceof ilObjQuestionPool)
+		{
+			$this->object->purgeQuestions();
+		}
 		// reset test_id SESSION variable
 		$_SESSION["test_id"] = "";
 
@@ -917,13 +922,13 @@ class ilObjQuestionPoolGUI extends ilObjectGUI
 		{
 			$this->tpl->setCurrentBlock("QTypes");
 			$types =& $this->object->getQuestionTypes(false, true);
-			$lastquestiontype = $ilUser->getPref("tst_lastquestiontype");
+			//$lastquestiontype = $ilUser->getPref("tst_lastquestiontype");
 			foreach ($types as $translation => $data)
 			{
-				if ($data["type_tag"] == $lastquestiontype)
+				/*if ($data["type_tag"] == $lastquestiontype)
 				{
 					$this->tpl->setVariable("QUESTION_TYPE_SELECTED", " selected=\"selected\"");
-				}
+				}*/
 				$this->tpl->setVariable("QUESTION_TYPE_ID", $data["type_tag"]);
 				$this->tpl->setVariable("QUESTION_TYPE", $translation);
 				$this->tpl->parseCurrentBlock();

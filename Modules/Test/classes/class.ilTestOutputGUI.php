@@ -17,7 +17,7 @@ require_once 'Modules/TestQuestionPool/classes/class.assQuestion.php';
  * 
  * @author		Helmut Schottmüller <helmut.schottmueller@mac.com>
  * @author		Björn Heyser <bheyser@databay.de>
- * @version		$Id: class.ilTestOutputGUI.php 48783 2014-03-20 11:47:47Z mjansen $
+ * @version		$Id: class.ilTestOutputGUI.php 56573 2014-12-18 10:56:18Z nkrzywon $
  * 
  * @ingroup ModulesTest
  * 
@@ -449,7 +449,7 @@ class ilTestOutputGUI extends ilTestServiceGUI
 			$this->tpl->setVariable("JAVASCRIPT_URL", $this->ctrl->getLinkTarget($this, "gotoQuestion"));
 		}
 
-		if ($question_gui->object->supportsJavascriptOutput())
+		if ($question_gui->object->supportsJavascriptOutput() && !$this->object->getForceJS())
 		{
 			$this->tpl->touchBlock("jsswitch");
 		}
@@ -1463,7 +1463,15 @@ class ilTestOutputGUI extends ilTestServiceGUI
 		{
 			$confirmation->setCancel($this->lng->txt("tst_finish_confirm_cancel_button"), 'backConfirmFinish');
 		}
-		$this->tpl->setVariable($this->getContentBlockName(), $confirmation->getHtml());
+		if($this->object->getKioskMode())
+		{
+			$this->tpl->addBlockfile($this->getContentBlockName(), 'content', "tpl.il_as_tst_kiosk_mode_content.html", "Modules/Test");
+			$this->tpl->setContent($confirmation->getHtml());
+		}
+		else
+		{
+			$this->tpl->setVariable($this->getContentBlockName(), $confirmation->getHtml());
+		}
 	}
 	
 /**
@@ -1503,7 +1511,6 @@ class ilTestOutputGUI extends ilTestServiceGUI
 		
 		if (($actualpass == $this->object->getNrOfTries() - 1) && (!$confirm))
 		{
-			$this->object->setActiveTestSubmitted($ilUser->getId());
 			$ilAuth->setIdle(ilSession::getIdleValue(), false);
 			$ilAuth->setExpire(0);
 			switch ($this->object->getMailNotification())
@@ -1554,6 +1561,10 @@ class ilTestOutputGUI extends ilTestServiceGUI
 						$this->object->sendAdvancedNotification($active_id);
 						break;
 				}
+			}
+			if( !$this->object->getTestSession()->isSubmitted() )
+			{
+				$this->object->setActiveTestSubmitted($ilUser->getId());
 			}
 			$this->object->getTestSession()->increaseTestPass();
 		}

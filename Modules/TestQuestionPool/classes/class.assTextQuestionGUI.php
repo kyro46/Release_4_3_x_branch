@@ -32,7 +32,7 @@ include_once "./Modules/Test/classes/inc.AssessmentConstants.php";
 *
 * @author		Helmut Schottmüller <helmut.schottmueller@mac.com>
 * @author		Björn Heyser <bheyser@databay.de>
-* @version	$Id: class.assTextQuestionGUI.php 53767 2014-09-24 08:20:35Z mbecker $
+* @version	$Id: class.assTextQuestionGUI.php 54915 2014-11-07 14:35:33Z bheyser $
 * @ingroup ModulesTestQuestionPool
 */
 class assTextQuestionGUI extends assQuestionGUI
@@ -148,12 +148,27 @@ class assTextQuestionGUI extends assQuestionGUI
 		if ($this->object->getMaxNumOfChars() > 0) $maxchars->setValue($this->object->getMaxNumOfChars());
 		$maxchars->setInfo($this->lng->txt("description_maxchars"));
 		$form->addItem($maxchars);
+		
+		// text rating
+		$textrating = new ilSelectInputGUI($this->lng->txt("text_rating"), "text_rating");
+		$text_options = array(
+			"ci" => $this->lng->txt("cloze_textgap_case_insensitive"),
+			"cs" => $this->lng->txt("cloze_textgap_case_sensitive"),
+			"l1" => sprintf($this->lng->txt("cloze_textgap_levenshtein_of"), "1"),
+			"l2" => sprintf($this->lng->txt("cloze_textgap_levenshtein_of"), "2"),
+			"l3" => sprintf($this->lng->txt("cloze_textgap_levenshtein_of"), "3"),
+			"l4" => sprintf($this->lng->txt("cloze_textgap_levenshtein_of"), "4"),
+			"l5" => sprintf($this->lng->txt("cloze_textgap_levenshtein_of"), "5")
+		);
+		$textrating->setOptions($text_options);
+		$textrating->setValue($this->object->getTextRating());
+		$form->addItem($textrating);
 
 		if (!$this->getSelfAssessmentEditingMode())
 		{	
 			if( $this->object->getAnswerCount() == 0 )
 			{
-				$this->object->addAnswer("", 0, 0, 0);
+				$this->object->addAnswer("", 1, 0, 0);
 			}
 
 			$scoringMode = new ilRadioGroupInputGUI(
@@ -686,7 +701,7 @@ class assTextQuestionGUI extends assQuestionGUI
 		
 			foreach ($this->object->getAnswers() as $idx => $ans)
 			{
-				if ($this->object->isKeywordInAnswer($user_answer, $ans->getAnswertext() ))
+				if ($this->object->isKeywordMatching($user_answer, $ans->getAnswertext() ))
 				{
 					$feedback .= '<tr><td><b><i>' . $ans->getAnswertext() . '</i></b></td><td>';
 					$feedback .= $this->object->getFeedbackSingleAnswer($idx) . '</td> </tr>';

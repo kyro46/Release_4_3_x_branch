@@ -6,7 +6,7 @@
 * special template class to simplify handling of ITX/PEAR
 * @author	Stefan Kesseler <skesseler@databay.de>
 * @author	Sascha Hofmann <shofmann@databay.de>
-* @version	$Id: class.ilTemplate.php 44267 2013-08-19 14:03:13Z akill $
+* @version	$Id: class.ilTemplate.php 54086 2014-10-07 13:19:43Z mjansen $
 */
 class ilTemplate extends ilTemplateX
 {
@@ -1934,15 +1934,15 @@ class ilTemplate extends ilTemplateX
 	/**
 	* Accessibility focus for screen readers
 	*/
-	function fillScreenReaderFocus()
-	{
-		global $ilUser;
+function fillScreenReaderFocus()
+{
+	global $ilUser;
 
-		if (is_object($ilUser) && $ilUser->getPref("screen_reader_optimization"))
-		{
-			$this->touchBlock("sr_focus");
-		}
+	if (is_object($ilUser) && $ilUser->getPref("screen_reader_optimization") && $this->blockExists('sr_focus'))
+	{
+		$this->touchBlock("sr_focus");
 	}
+}
 	
 	/**
 	* Fill side icons (upper icon, tree icon, webfolder icon)

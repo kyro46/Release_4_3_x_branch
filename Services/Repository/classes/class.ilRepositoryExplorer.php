@@ -8,7 +8,7 @@ require_once("./Services/UIComponent/Explorer/classes/class.ilExplorer.php");
  * Repository Explorer
  *
  * @author Alex Killing <alex.killing@gmx.de>
- * @version $Id: class.ilRepositoryExplorer.php 47297 2014-01-16 12:30:40Z smeyer $
+ * @version $Id: class.ilRepositoryExplorer.php 55405 2014-11-21 10:44:08Z jluetzen $
  * @ingroup	ServicesRepository
  */
 class ilRepositoryExplorer extends ilExplorer
@@ -516,6 +516,18 @@ class ilRepositoryExplorer extends ilExplorer
 			return true;
 		}
 		return false;
+	}
+	
+	function buildTitle($a_title, $a_id, $a_type)
+	{
+		if(!trim($a_title) && $a_type == "sess")
+		{
+			// #14367 - see ilObjSessionListGUI
+			include_once('./Modules/Session/classes/class.ilSessionAppointment.php');
+			$app_info = ilSessionAppointment::_lookupAppointment(ilObject::_lookupObjId($a_id)); 	
+			$a_title = ilSessionAppointment::_appointmentToString($app_info['start'], $app_info['end'],$app_info['fullday']);
+		}
+		return $a_title;
 	}
 
 } // END class ilRepositoryExplorer
